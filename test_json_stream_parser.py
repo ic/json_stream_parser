@@ -14,7 +14,7 @@ def test_ok_coverage():
         1.3e9
         1e9
         1e+1
-        1e-1
+        1E-1
         -1
         ""
         "asdf"

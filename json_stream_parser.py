@@ -166,7 +166,7 @@ def _load_num(ch: str, fp) -> Tuple[Union[int, float], str]:
         s += '.' + digits
 
     # exp
-    if ch == 'e':
+    if ch in 'eE':
         is_float = True
         s += ch
         ch = _read_char(fp, 'expect exp')
