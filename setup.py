@@ -9,7 +9,7 @@ setup(
     url='https://github.com/account-login/json_stream_parser',
     author='account-login',
     author_email='',
-    version='0.2dev',
+    version='0.3dev',
     py_modules=['json_stream_parser'],
     entry_points='''
         [console_scripts]

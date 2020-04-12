@@ -5,7 +5,8 @@ __all__ = ('load_iter', 'JSONDecodeError')
 
 
 class JSONDecodeError(Exception):
-    pass
+    def __init__(self, msg, *args):
+        super().__init__(msg % args)
 
 
 class JSONEOFError(JSONDecodeError):
@@ -210,7 +211,7 @@ def _skip_space(fp) -> str:
     while True:
         ch = fp.read(1)
         if not ch:
-            raise JSONEOFError()
+            raise JSONEOFError('unexpected EOF')
 
         if ch not in ' \t\n\r':
             return ch
