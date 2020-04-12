@@ -8,6 +8,8 @@ def test_ok_coverage():
     cases = r'''
         0
         -0
+        0.1
+        0e1
         123
         1.2
         1.123

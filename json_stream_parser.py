@@ -152,11 +152,9 @@ def _load_num(ch: str, fp) -> Tuple[Union[int, float], str]:
     digits, ch = _maybe_digits(fp)  # NOTE: ch may be ''
     s += digits
 
-    # zero is special
-    if is_zero:
-        if digits:
-            raise JSONDecodeError('digits follows zero')
-        return 0, ''
+    # check leading zero
+    if is_zero and digits:
+        raise JSONDecodeError('digits follows zero')
 
     # frac
     is_float = False
@@ -166,7 +164,7 @@ def _load_num(ch: str, fp) -> Tuple[Union[int, float], str]:
         s += '.' + digits
 
     # exp
-    if ch in 'eE':
+    if ch and ch in 'eE':
         is_float = True
         s += ch
         ch = _read_char(fp, 'expect exp')
