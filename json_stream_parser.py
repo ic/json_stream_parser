@@ -14,21 +14,26 @@ class JSONEOFError(JSONDecodeError):
 
 
 # TODO: options
-def load_iter(fp, *, object_pairs_hook=dict):
+def load_iter(fp, *, object_pairs_hook=dict, splat_depth:int=0):
+    if splat_depth > 0:
+        ch = fp.read(splat_depth)
+        if not ch:
+            raise JSONEOFError('unexpected EOF')
     ch = ''
     while True:
         try:
             ch = _skip_ch_space(ch, fp)
         except JSONEOFError:
             return
-        obj, ch = _load_obj(ch, fp, object_pairs_hook=object_pairs_hook)
-        yield obj
+        obj, ch = _load_obj(ch, fp, object_pairs_hook=object_pairs_hook, splat=splat_depth)
+        if not obj is None or not ch is None:
+            yield obj
 
 
 Value = Union[int, float, str, None, List['Value'], Dict[str, 'Value']]
 
 
-def _load_obj(ch, fp, *, object_pairs_hook) -> Tuple[Value, str]:
+def _load_obj(ch, fp, *, object_pairs_hook, splat:int=0) -> Tuple[Value, str]:
     if ch == '{':
         ch = ''
         pairs = []
@@ -81,6 +86,13 @@ def _load_obj(ch, fp, *, object_pairs_hook) -> Tuple[Value, str]:
         return _load_str(fp), ''
     elif ch in '0123456789-':
         return _load_num(ch, fp)
+    elif splat and ch == ',':
+        ch = _skip_splat(fp)
+        ch = _skip_ch_space(ch, fp)
+        return _load_obj(ch, fp, object_pairs_hook=object_pairs_hook)
+    elif splat and ch == ']':
+        _expect(fp, ']' * (splat-1))
+        return None, None
     else:
         raise JSONDecodeError('unknown char: %r', ch)
 
@@ -221,6 +233,13 @@ def _skip_ch_space(ch, fp) -> str:
     if ch and ch not in ' \t\n\r':
         return ch
     return _skip_space(fp)
+
+
+def _skip_splat(fp) -> str:
+    ch = fp.read(1)
+    if not ch:
+        raise JSONEOFError('unexpected EOF')
+    return ch
 
 
 def main():

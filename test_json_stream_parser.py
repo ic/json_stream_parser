@@ -62,3 +62,17 @@ def test_bad_coverage():
             stream = load_iter(io.StringIO(line))
             with pytest.raises(JSONDecodeError):
                 next(stream)
+
+
+def test_splat_depth_1():
+    data = json.dumps([ { 'test': 0 } ] * 3)
+    expected = data[1:-1].replace(', ', '\n')
+    parsed = '\n'.join(json.dumps(x) for x in load_iter(io.StringIO(data), splat_depth=1))
+    assert expected == parsed
+
+
+def test_splat_depth_2():
+    data = json.dumps([[ { 'test': 0 } ] * 3])
+    expected = data[2:-2].replace(', ', '\n')
+    parsed = '\n'.join(json.dumps(x) for x in load_iter(io.StringIO(data), splat_depth=2))
+    assert expected == parsed
